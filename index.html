@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 大模型全景 — 深入理解大型语言模型</title>
+  <meta name="description" content="全面介绍大型语言模型（LLM）的架构、训练、应用与未来。涵盖 Transformer、微调、RAG、多模态等核心技术。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ===== 导航栏 ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="2" y="2" width="24" height="24" rx="6" stroke="url(#g1)" stroke-width="2"/>
+            <circle cx="9" cy="11" r="2" fill="#00d4ff"/>
+            <circle cx="19" cy="11" r="2" fill="#a855f7"/>
+            <circle cx="9" cy="19" r="2" fill="#a855f7"/>
+            <circle cx="19" cy="19" r="2" fill="#00d4ff"/>
+            <line x1="9" y1="11" x2="19" y2="19" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+            <line x1="19" y1="11" x2="9" y2="19" stroke="#a855f7" stroke-width="1.5" opacity="0.5"/>
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="28" y2="28">
+                <stop stop-color="#00d4ff"/>
+                <stop offset="1" stop-color="#a855f7"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span class="logo-text">AI<span class="logo-accent">Models</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#overview" class="nav-link active">总览</a></li>
+        <li><a href="#architecture" class="nav-link">架构</a></li>
+        <li><a href="#training" class="nav-link">训练</a></li>
+        <li><a href="#applications" class="nav-link">应用</a></li>
+        <li><a href="#timeline" class="nav-link">时间线</a></li>
+      </ul>
+      <a href="#cta" class="nav-cta">开始探索</a>
+      <button class="nav-toggle" id="navToggle" aria-label="菜单">
+        <span class="hamburger"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== 移动端菜单 ===== -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#overview" class="mobile-link">总览</a>
+    <a href="#architecture" class="mobile-link">架构</a>
+    <a href="#training" class="mobile-link">训练</a>
+    <a href="#applications" class="mobile-link">应用</a>
+    <a href="#timeline" class="mobile-link">时间线</a>
+  </div>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" id="hero">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        深度技术解析
+      </div>
+      <h1 class="hero-title">
+        <span class="line">深入理解</span>
+        <span class="line gradient-text">大型语言模型</span>
+        <span class="line">的奥秘</span>
+      </h1>
+      <p class="hero-subtitle">
+        从 Transformer 架构到多模态融合，从预训练到对齐微调——
+        <br class="desktop-break" />
+        全面剖析驱动 AI 革命的核心技术。
+      </p>
+      <div class="hero-actions">
+        <a href="#overview" class="btn-primary">
+          探索全景
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="#architecture" class="btn-secondary">查看架构</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number" data-target="175">0</span>
+          <span class="stat-suffix">B</span>
+          <span class="stat-label">GPT-3 参数</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="137">0</span>
+          <span class="stat-suffix">B</span>
+          <span class="stat-label">PaLM 参数</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="100">0</span>
+          <span class="stat-suffix">T+</span>
+          <span class="stat-label">训练 Token</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="mouse">
+        <div class="wheel"></div>
+      </div>
+      <span>向下滚动</span>
+    </div>
+  </section>
+
+  <!-- ===== 总览 ===== -->
+  <section class="section" id="overview">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">01 — 总览</span>
+        <h2 class="section-title">什么是大型语言模型？</h2>
+        <p class="section-desc">
+          大型语言模型（Large Language Models, LLMs）是基于深度学习、尤其是 Transformer 架构构建的
+          神经网络模型，它们通过在海量文本数据上进行预训练，习得语言的深层模式与世界知识，
+          从而能够执行文本生成、理解、推理、翻译等多种自然语言处理任务。
+        </p>
+      </div>
+
+      <div class="overview-grid">
+        <div class="overview-card reveal">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="4" width="24" height="24" rx="4" stroke="#00d4ff" stroke-width="2"/>
+              <path d="M10 12h12M10 16h12M10 20h8" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>涌现能力</h3>
+          <p>当模型规模超过某个阈值后，会展现出训练目标中未明确要求的能力，如链式思维推理、代码生成等，这是 LLM 最令人瞩目的特性之一。</p>
+        </div>
+
+        <div class="overview-card reveal" data-delay="100">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="16" r="12" stroke="#a855f7" stroke-width="2"/>
+              <path d="M16 8v8l5 5" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>规模法则</h3>
+          <p>模型性能与参数量、数据量、计算量之间遵循幂律关系（Scaling Laws）。更大、更多、更久——这是过去几年 AI 进步的核心驱动力。</p>
+        </div>
+
+        <div class="overview-card reveal" data-delay="200">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="6" y="6" width="20" height="20" rx="3" stroke="#34d399" stroke-width="2"/>
+              <circle cx="13" cy="13" r="3" stroke="#34d399" stroke-width="2"/>
+              <circle cx="21" cy="19" r="3" stroke="#34d399" stroke-width="2"/>
+              <line x1="15" y1="15" x2="19" y2="17" stroke="#34d399" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3>通用性</h3>
+          <p>一个 LLM 可以同时处理问答、摘要、翻译、写作、编程、数学推理等数十种任务，无需为每个任务单独训练模型，展现了极强的通用性。</p>
+        </div>
+
+        <div class="overview-card reveal" data-delay="300">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M8 24V14a8 8 0 0116 0v10" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+              <line x1="8" y1="24" x2="24" y2="24" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="16" cy="20" r="2" fill="#f59e0b"/>
+            </svg>
+          </div>
+          <h3>安全对齐</h3>
+          <p>通过 RLHF（基于人类反馈的强化学习）、DPO（直接偏好优化）等对齐技术，使模型输出符合人类价值观，减少有害、偏见和幻觉输出。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 架构 ===== -->
+  <section class="section section-dark" id="architecture">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">02 — 核心架构</span>
+        <h2 class="section-title">Transformer 架构</h2>
+        <p class="section-desc">
+          2017 年 Google 发布的 "Attention Is All You Need" 论文奠定了现代 LLM 的基石。
+          Transformer 彻底摒弃了 RNN/CNN，完全依赖自注意力机制来建模序列依赖关系，
+          实现了前所未有的并行训练效率和长距离依赖捕捉能力。
+        </p>
+      </div>
+
+      <!-- 架构图 -->
+      <div class="arch-diagram reveal">
+        <div class="arch-canvas">
+          <div class="arch-layer input-layer">
+            <span class="layer-label">输入序列</span>
+            <div class="tokens">
+              <span class="token">你</span>
+              <span class="token">好</span>
+              <span class="token">世</span>
+              <span class="token">界</span>
+              <span class="token">[CLS]</span>
+            </div>
+          </div>
+          <div class="arch-arrow"></div>
+          <div class="arch-layer embed-layer">
+            <span class="layer-label">Token 嵌入</span>
+            <div class="embed-box">
+              <div class="embed-item">词嵌入</div>
+              <div class="embed-item">位置编码</div>
+              <div class="embed-item">层归一化</div>
+            </div>
+          </div>
+          <div class="arch-arrow"></div>
+          <div class="arch-layer transformer-block">
+            <div class="block-header">Transformer Block × N</div>
+            <div class="block-content">
+              <div class="block-part attention">
+                <span class="part-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="5" cy="5" r="2" fill="#00d4ff"/>
+                    <circle cx="15" cy="5" r="2" fill="#00d4ff"/>
+                    <circle cx="5" cy="15" r="2" fill="#a855f7"/>
+                    <circle cx="15" cy="15" r="2" fill="#a855f7"/>
+                    <line x1="5" y1="5" x2="15" y2="15" stroke="#00d4ff" stroke-width="1"/>
+                    <line x1="15" y1="5" x2="5" y2="15" stroke="#a855f7" stroke-width="1"/>
+                  </svg>
+                </span>
+                <div>
+                  <h4>自注意力机制</h4>
+                  <p>Q · K<sup>T</sup> / √d<sub>k</sub> → softmax → · V</p>
+                </div>
+              </div>
+              <div class="block-part residual">
+                <span class="part-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M4 10h12M10 4v12" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <div>
+                  <h4>残差连接</h4>
+                  <p>x = x + Sublayer(x)</p>
+                </div>
+              </div>
+              <div class="block-part ffn">
+                <span class="part-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="3" y="3" width="14" height="14" rx="2" stroke="#f59e0b" stroke-width="2"/>
+                    <path d="M7 7l3 3 3-3M7 13l3-3 3 3" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <div>
+                  <h4>前馈网络 (FFN)</h4>
+                  <p>MLP: W₂ · GELU(W₁x + b₁) + b₂</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="arch-arrow"></div>
+          <div class="arch-layer output-layer">
+            <span class="layer-label">输出层</span>
+            <div class="output-box">
+              <span class="output-item">词表投影</span>
+              <span class="output-item">Softmax</span>
+              <span class="output-item">概率分布</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 架构对比 -->
+      <div class="arch-comparison reveal">
+        <h3 class="sub-heading">主流架构变体</h3>
+        <div class="comparison-grid">
+          <div class="comparison-card">
+            <div class="comp-badge badge-blue">Encoder-Decoder</div>
+            <h4>原始 Transformer</h4>
+            <p>编码器处理输入序列，解码器自回归生成输出。T5、BART 采用此架构，擅长序列到序列任务如翻译、摘要。</p>
+            <div class="comp-tags">
+              <span class="tag">T5</span>
+              <span class="tag">BART</span>
+              <span class="tag">mT5</span>
+            </div>
+          </div>
+          <div class="comparison-card highlight">
+            <div class="comp-badge badge-purple">Decoder-Only</div>
+            <h4>自回归模型</h4>
+            <p>仅使用解码器，逐 token 自回归生成。GPT 系列、LLaMA、Qwen 均采用此架构，是当前 LLM 的主流选择，推理效率高。</p>
+            <div class="comp-tags">
+              <span class="tag">GPT</span>
+              <span class="tag">LLaMA</span>
+              <span class="tag">Qwen</span>
+              <span class="tag">Mistral</span>
+            </div>
+          </div>
+          <div class="comparison-card">
+            <div class="comp-badge badge-green">Encoder-Only</div>
+            <h4>理解型模型</h4>
+            <p>仅使用编码器，擅长理解任务如分类、NER、语义搜索。BERT 系列是代表，常作为搜索和排序系统的骨干。</p>
+            <div class="comp-tags">
+              <span class="tag">BERT</span>
+              <span class="tag">RoBERTa</span>
+              <span class="tag">DeBERTa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 注意力机制详解 -->
+      <div class="attention-detail reveal">
+        <div class="attention-left">
+          <h3 class="sub-heading">自注意力机制</h3>
+          <p>自注意力是 Transformer 的核心创新。对于序列中的每个位置，它计算该位置与所有其他位置的相关性权重，从而动态地聚合全局上下文信息。</p>
+          <p>这使得模型能够：
+            <ul class="detail-list">
+              <li>捕捉任意距离的依赖关系，不受序列长度限制</li>
+              <li>并行计算所有位置，大幅提升训练效率</li>
+              <li>根据上下文动态调整关注点，实现语义理解</li>
+            </ul>
+          </p>
+        </div>
+        <div class="attention-right">
+          <div class="formula-card">
+            <span class="formula-label">缩放点积注意力</span>
+            <div class="formula">
+              Attention(Q, K, V) = softmax(<span class="f-q">Q</span>·<span class="f-k">K</span><sup>T</sup> / √d<sub>k</sub>) · <span class="f-v">V</span>
+            </div>
+            <div class="formula-legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#00d4ff"></span> Q — 查询向量</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#a855f7"></span> K — 键向量</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#34d399"></span> V — 值向量</div>
+            </div>
+            <div class="formula-note">
+              其中 Q, K, V 由输入 X 通过可学习权重 W<sup>Q</sup>, W<sup>K</sup>, W<sup>V</sup> 线性变换得到。
+              √d<sub>k</sub> 缩放因子防止点积值过大导致 softmax 梯度消失。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 训练流程 ===== -->
+  <section class="section" id="training">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">03 — 训练流程</span>
+        <h2 class="section-title">从预训练到对齐</h2>
+        <p class="section-desc">
+          一个完整的 LLM 训练通常经历四个阶段：预训练 → 有监督微调 → 奖励建模 → 强化学习/偏好优化。
+          每个阶段的目标和数据都截然不同，共同塑造了模型的能力与行为。
+        </p>
+      </div>
+
+      <div class="training-pipeline">
+        <div class="pipeline-stage reveal">
+          <div class="stage-number">1</div>
+          <div class="stage-content">
+            <h3>预训练 (Pre-training)</h3>
+            <p>在海量无标注文本（互联网网页、书籍、代码、论文等）上训练模型，学习语言的统计规律和世界知识。训练目标是下一个 token 预测（Next Token Prediction）。</p>
+            <div class="stage-details">
+              <div class="detail-item">
+                <span class="detail-label">数据</span>
+                <span class="detail-value">万亿级 Token</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">目标</span>
+                <span class="detail-value">最小化交叉熵</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">算力</span>
+                <span class="detail-value">数千~数万 GPU</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-connector">
+          <div class="connector-line"></div>
+          <span class="connector-label">↓</span>
+        </div>
+
+        <div class="pipeline-stage reveal" data-delay="150">
+          <div class="stage-number">2</div>
+          <div class="stage-content">
+            <h3>有监督微调 (SFT)</h3>
+            <p>使用高质量的人工标注指令-回答对，教会模型遵循用户指令、以对话格式回应。这一步将"文本补全器"转变为"指令跟随器"。</p>
+            <div class="stage-details">
+              <div class="detail-item">
+                <span class="detail-label">数据</span>
+                <span class="detail-value">数万~数十万条对话</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">目标</span>
+                <span class="detail-value">指令遵循</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">方法</span>
+                <span class="detail-value">全量/LoRA 微调</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-connector">
+          <div class="connector-line"></div>
+          <span class="connector-label">↓</span>
+        </div>
+
+        <div class="pipeline-stage reveal" data-delay="300">
+          <div class="stage-number">3</div>
+          <div class="stage-content">
+            <h3>奖励建模 (Reward Modeling)</h3>
+            <p>训练一个奖励模型（RM），学习对人类偏好的量化评估。RM 输入一对回答，输出哪个更好以及好多少，为后续强化学习提供信号。</p>
+            <div class="stage-details">
+              <div class="detail-item">
+                <span class="detail-label">数据</span>
+                <span class="detail-value">人类偏好排序对</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">目标</span>
+                <span class="detail-value">偏好预测</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">损失</span>
+                <span class="detail-value">Bradley-Terry 模型</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-connector">
+          <div class="connector-line"></div>
+          <span class="connector-label">↓</span>
+        </div>
+
+        <div class="pipeline-stage reveal" data-delay="450">
+          <div class="stage-number">4</div>
+          <div class="stage-content">
+            <h3>强化学习 / 偏好优化 (RLHF / DPO)</h3>
+            <p>利用奖励模型作为奖励信号，通过 PPO 等强化学习算法优化策略模型；或使用 DPO 直接从偏好数据中优化，免去 RM 训练步骤。最终使模型输出安全、有用、符合人类价值观。</p>
+            <div class="stage-details">
+              <div class="detail-item">
+                <span class="detail-label">方法</span>
+                <span class="detail-value">PPO / DPO / GRPO</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">目标</span>
+                <span class="detail-value">对齐人类偏好</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">效果</span>
+                <span class="detail-value">更安全、更有帮助</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 微调方法 -->
+      <div class="fine-tuning reveal">
+        <h3 class="sub-heading">参数高效微调方法</h3>
+        <div class="ft-grid">
+          <div class="ft-card">
+            <h4>LoRA</h4>
+            <p>低秩自适应：在冻结的预训练权重旁注入可训练的低秩分解矩阵，仅训练 0.1%~1% 的参数，显存需求大幅降低。</p>
+            <code>r = rank, α = scaling</code>
+          </div>
+          <div class="ft-card">
+            <h4>QLoRA</h4>
+            <p>量化 + LoRA：将基座模型量化至 4-bit 存储，再叠加 LoRA 训练。单张 24GB 显卡即可微调 65B 模型。</p>
+            <code>NF4 + DoRA + Paged Optimizer</code>
+          </div>
+          <div class="ft-card">
+            <h4>全量微调</h4>
+            <p>更新所有参数，效果上限最高但算力需求巨大。适合有充足算力且需要深度定制的场景。</p>
+            <code>需要数千 GPU · 数天训练</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 应用 ===== -->
+  <section class="section section-dark" id="applications">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">04 — 应用场景</span>
+        <h2 class="section-title">大模型正在改变什么</h2>
+        <p class="section-desc">
+          LLM 已渗透至各行各业，从软件开发到科学研究，从内容创作到企业决策，
+          重新定义了人机交互的边界。
+        </p>
+      </div>
+
+      <div class="app-tabs">
+        <button class="app-tab active" data-tab="coding">🔧 编程开发</button>
+        <button class="app-tab" data-tab="research">🔬 科学研究</button>
+        <button class="app-tab" data-tab="creative">🎨 创意内容</button>
+        <button class="app-tab" data-tab="enterprise">🏢 企业应用</button>
+      </div>
+
+      <div class="app-panels">
+        <div class="app-panel active" data-panel="coding">
+          <div class="app-grid">
+            <div class="app-item reveal">
+              <h4>代码生成与补全</h4>
+              <p>Copilot、Cursor、Windsurf 等工具让 AI 成为开发者的结对伙伴，自动补全代码、解释复杂逻辑、生成单元测试。</p>
+            </div>
+            <div class="app-item reveal" data-delay="100">
+              <h4>代码审查与调试</h4>
+              <p>自动识别潜在 bug、安全漏洞、性能瓶颈，提供修复建议和代码重构方案，显著降低维护成本。</p>
+            </div>
+            <div class="app-item reveal" data-delay="200">
+              <h4>Agent 自主编程</h4>
+              <p>Devin、SWE-Agent 等 AI Agent 能够自主理解需求、规划方案、编写代码、运行测试、修复错误，端到端完成开发任务。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-panel" data-panel="research">
+          <div class="app-grid">
+            <div class="app-item">
+              <h4>文献综述与知识提取</h4>
+              <p>快速阅读数百篇论文，提取关键发现、方法对比、实验结果，生成结构化综述，加速科研进程。</p>
+            </div>
+            <div class="app-item">
+              <h4>假设生成与实验设计</h4>
+              <p>基于已有知识提出新研究假设，设计实验方案，分析数据，在药物发现、材料科学等领域展现潜力。</p>
+            </div>
+            <div class="app-item">
+              <h4>数学推理与证明</h4>
+              <p>AlphaProof 利用 LLM 辅助数学证明，在 IMO 级别竞赛中达到金牌水平，开启 AI 辅助数学研究新纪元。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-panel" data-panel="creative">
+          <div class="app-grid">
+            <div class="app-item">
+              <h4>写作与内容创作</h4>
+              <p>辅助撰写文章、剧本、营销文案、小说，提供创意灵感、优化表达、保持风格一致性。</p>
+            </div>
+            <div class="app-item">
+              <h4>多模态生成</h4>
+              <p>GPT-4o、Sora、DALL·E 等模型实现文本到图像、文本到视频的生成，打破创意表达的技术壁垒。</p>
+            </div>
+            <div class="app-item">
+              <h4>个性化交互</h4>
+              <p>智能客服、虚拟助手、教育辅导、心理咨询等场景，提供有温度、有共情的自然对话体验。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-panel" data-panel="enterprise">
+          <div class="app-grid">
+            <div class="app-item">
+              <h4>RAG 知识增强</h4>
+              <p>检索增强生成（RAG）让模型基于企业私有知识库回答问题，解决幻觉问题，实现"有据可依"的智能问答。</p>
+            </div>
+            <div class="app-item">
+              <h4>业务流程自动化</h4>
+              <p>智能合同审查、财务报告生成、客户数据洞察、供应链优化，将 AI 嵌入核心业务流，提升效率与准确性。</p>
+            </div>
+            <div class="app-item">
+              <h4>决策支持系统</h4>
+              <p>分析市场趋势、风险评估、方案比选，为管理层提供数据驱动的决策建议，降低信息不对称。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAG 架构 -->
+      <div class="rag-section reveal">
+        <h3 class="sub-heading">RAG 架构详解</h3>
+        <div class="rag-diagram">
+          <div class="rag-box">
+            <span class="rag-label">用户查询</span>
+            <span class="rag-text">"公司 2024 Q3 营收多少？"</span>
+          </div>
+          <div class="rag-arrow">→</div>
+          <div class="rag-box rag-embed">
+            <span class="rag-label">Embedding</span>
+            <span class="rag-text">向量化查询</span>
+          </div>
+          <div class="rag-arrow">→</div>
+          <div class="rag-box rag-retrieval">
+            <span class="rag-label">向量检索</span>
+            <span class="rag-text">Top-K 相似文档</span>
+            <span class="rag-sub">FAISS / Milvus / Pinecone</span>
+          </div>
+          <div class="rag-arrow">→</div>
+          <div class="rag-box rag-augment">
+            <span class="rag-label">上下文增强</span>
+            <span class="rag-text">Query + Context</span>
+          </div>
+          <div class="rag-arrow">→</div>
+          <div class="rag-box rag-llm">
+            <span class="rag-label">LLM 生成</span>
+            <span class="rag-text">基于证据的回答</span>
+          </div>
+          <div class="rag-arrow">→</div>
+          <div class="rag-box rag-output">
+            <span class="rag-label">输出</span>
+            <span class="rag-text">"2024 Q3 营收为 ¥XX 亿，环比增长 12%…"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 时间线 ===== -->
+  <section class="section" id="timeline">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">05 — 发展时间线</span>
+        <h2 class="section-title">LLM 演进史</h2>
+        <p class="section-desc">从词袋模型到多模态大模型，AI 语言理解经历了怎样的蜕变？</p>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-line"></div>
+
+        <div class="timeline-item left reveal">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2017</span>
+            <h4>Transformer 诞生</h4>
+            <p>Google 发表 "Attention Is All You Need"，提出完全基于注意力机制的 Transformer 架构，彻底改变 NLP 领域。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item right reveal" data-delay="100">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2018</span>
+            <h4>BERT & GPT 问世</h4>
+            <p>Google 发布 BERT（双向编码器），OpenAI 发布 GPT（自回归解码器），开创预训练+微调范式，NLP 进入大模型时代。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item left reveal" data-delay="200">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2020</span>
+            <h4>GPT-3 与涌现能力</h4>
+            <p>OpenAI 发布 1750 亿参数的 GPT-3，展示少样本/零样本学习能力。研究者发现"涌现能力"现象，引发对规模效应的深入探讨。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item right reveal" data-delay="300">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2021</span>
+            <h4>RLHF 与 InstructGPT</h4>
+            <p>OpenAI 提出基于人类反馈的强化学习（RLHF）方法，发布 InstructGPT，证明对齐技术可以显著提升模型有用性和安全性。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item left reveal" data-delay="400">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2022</span>
+            <h4>GPT-4 & 多模态</h4>
+            <p>OpenAI 发布 GPT-4，支持文本+图像输入，通过大学水平考试。同年 Stable Diffusion 发布，开源图像生成生态爆发。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item right reveal" data-delay="500">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2023</span>
+            <h4>开源浪潮 & ChatGPT</h4>
+            <p>ChatGPT 发布引爆全球 AI 热潮。Llama 2、Mistral、Qwen 等开源模型涌现，LoRA 微调成为标配，RAG 架构广泛落地。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item left reveal" data-delay="600">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2024</span>
+            <h4>推理模型 & Agent 元年</h4>
+            <p>o1/o3 推理模型、Gemini 1.5 长上下文、Sora 视频生成、AI Agent 框架成熟。MoE 架构成为主流，推理成本持续下降。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item right reveal" data-delay="700">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2025</span>
+            <h4>迈向 AGI</h4>
+            <p>多模态统一、世界模型、具身智能、AI 科学家……大模型正从"语言工具"演化为"通用智能体"，AGI 的轮廓逐渐清晰。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 技术对比表 ===== -->
+  <section class="section section-dark" id="comparison">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">06 — 模型对比</span>
+        <h2 class="section-title">主流模型一览</h2>
+        <p class="section-desc">当前全球最具代表性的 LLM 模型核心参数对比（数据截至 2025 年，部分为估算值）。</p>
+      </div>
+
+      <div class="table-wrapper reveal">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>模型</th>
+              <th>机构</th>
+              <th>参数规模</th>
+              <th>架构</th>
+              <th>上下文窗口</th>
+              <th>开源</th>
+              <th>特色</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="model-name">GPT-4o</td>
+              <td>OpenAI</td>
+              <td>未公开</td>
+              <td>Decoder-only</td>
+              <td>128K</td>
+              <td><span class="badge-no">否</span></td>
+              <td>原生多模态、低延迟</td>
+            </tr>
+            <tr>
+              <td class="model-name">Claude 4</td>
+              <td>Anthropic</td>
+              <td>未公开</td>
+              <td>Decoder-only</td>
+              <td>200K</td>
+              <td><span class="badge-no">否</span></td>
+              <td>安全对齐、长文本</td>
+            </tr>
+            <tr>
+              <td class="model-name">Gemini 2.0</td>
+              <td>Google</td>
+              <td>未公开 (MoE)</td>
+              <td>MoE</td>
+              <td>1M+</td>
+              <td><span class="badge-no">否</span></td>
+              <td>超长上下文、多模态</td>
+            </tr>
+            <tr>
+              <td class="model-name">LLaMA 3.1 405B</td>
+              <td>Meta</td>
+              <td>405B</td>
+              <td>Decoder-only</td>
+              <td>128K</td>
+              <td><span class="badge-yes">是</span></td>
+              <td>开源旗舰、生态丰富</td>
+            </tr>
+            <tr>
+              <td class="model-name">Qwen 2.5</td>
+              <td>Alibaba</td>
+              <td>0.5B~72B</td>
+              <td>Decoder-only</td>
+              <td>128K</td>
+              <td><span class="badge-yes">是</span></td>
+              <td>中文强、多尺寸、开源</td>
+            </tr>
+            <tr>
+              <td class="model-name">DeepSeek V3</td>
+              <td>DeepSeek</td>
+              <td>671B (MoE)</td>
+              <td>MoE</td>
+              <td>128K</td>
+              <td><span class="badge-yes">是</span></td>
+              <td>MoE 高效、推理成本低</td>
+            </tr>
+            <tr>
+              <td class="model-name">Mistral Large</td>
+              <td>Mistral AI</td>
+              <td>123B (MoE)</td>
+              <td>MoE</td>
+              <td>128K</td>
+              <td><span class="badge-yes">是</span></td>
+              <td>欧洲开源、效率优秀</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="section cta-section" id="cta">
+    <div class="container">
+      <div class="cta-content reveal">
+        <h2 class="cta-title">准备好探索 AI 大模型的更多可能了吗？</h2>
+        <p class="cta-desc">
+          无论是学习 Transformer 原理、动手微调模型，还是构建生产级 AI 应用，
+          这里都有你需要的知识和工具。
+        </p>
+        <div class="cta-actions">
+          <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener" class="btn-primary">
+            阅读原始论文
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 4h12v12M4 16L16 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="scale(0.7) translate(1,1)"/>
+            </svg>
+          </a>
+          <a href="https://huggingface.co/models" target="_blank" rel="noopener" class="btn-secondary">
+            HuggingFace 模型库
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 4h12v12M4 16L16 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="scale(0.7) translate(1,1)"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo">
+            <span class="logo-icon">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <rect x="2" y="2" width="24" height="24" rx="6" stroke="url(#g2)" stroke-width="2"/>
+                <circle cx="9" cy="11" r="2" fill="#00d4ff"/>
+                <circle cx="19" cy="11" r="2" fill="#a855f7"/>
+                <circle cx="9" cy="19" r="2" fill="#a855f7"/>
+                <circle cx="19" cy="19" r="2" fill="#00d4ff"/>
+                <line x1="9" y1="11" x2="19" y2="19" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+                <line x1="19" y1="11" x2="9" y2="19" stroke="#a855f7" stroke-width="1.5" opacity="0.5"/>
+                <defs>
+                  <linearGradient id="g2" x1="0" y1="0" x2="28" y2="28">
+                    <stop stop-color="#00d4ff"/>
+                    <stop offset="1" stop-color="#a855f7"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </span>
+            <span class="logo-text">AI<span class="logo-accent">Models</span></span>
+          </a>
+          <p>深入理解大型语言模型的核心技术、训练流程与应用场景。纯静态站点，无追踪、无 Cookie。</p>
+        </div>
+        <div class="footer-links">
+          <h4>导航</h4>
+          <a href="#overview">总览</a>
+          <a href="#architecture">架构</a>
+          <a href="#training">训练</a>
+          <a href="#applications">应用</a>
+          <a href="#timeline">时间线</a>
+        </div>
+        <div class="footer-links">
+          <h4>资源</h4>
+          <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Transformer 论文</a>
+          <a href="https://huggingface.co/docs" target="_blank" rel="noopener">HuggingFace 文档</a>
+          <a href="https://github.com/huggingface/transformers" target="_blank" rel="noopener">Transformers 库</a>
+          <a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">LoRA 论文</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 AI Models. 教育用途，内容仅供学习参考。</span>
+        <span class="footer-made">Built with ❤️ & pure HTML/CSS/JS</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
